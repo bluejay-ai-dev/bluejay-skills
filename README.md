@@ -9,7 +9,7 @@ Self-improving voice agents, in Claude Code. Point Bluejay at your agent and a t
 /plugin install bluejay@bluejay-skills
 ```
 
-Then set your API key (Bluejay dashboard → Settings → API Keys):
+Then set your API key (app.getbluejay.ai → Settings → API Keys):
 
 ```
 export BLUEJAY_API_KEY=...
