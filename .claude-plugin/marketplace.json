@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "bluejay-skills",
+  "version": "0.1.0",
+  "description": "Claude Code skills for Bluejay — voice agent testing, evaluation, and self-improvement.",
+  "owner": { "name": "Bluejay" },
+  "plugins": [
+    {
+      "name": "bluejay",
+      "description": "Run Bluejay simulations, diagnose failures from transcripts, and auto-fix your agent's prompt — looping until your target pass rate.",
+      "version": "0.1.0",
+      "author": { "name": "Bluejay" },
+      "source": "./bluejay",
+      "category": "development"
+    }
+  ]
+}

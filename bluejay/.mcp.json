@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "bluejay": {
+      "type": "http",
+      "url": "https://REPLACE-WITH-BLUEJAY-MCP-ENDPOINT",
+      "headers": { "Authorization": "Bearer ${BLUEJAY_API_KEY}" }
+    }
+  }
+}
