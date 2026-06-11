@@ -31,7 +31,7 @@ base_branch: ""                  # blank = repo default branch
 ## Onboarding (only when there is no config)
 Rule for every input: **detect → confirm → ask only if undetectable → default.** Never ask what you can read; always confirm before creating anything in Bluejay.
 1. **Provider.** Detect from the Bluejay agent's `connection_type` + repo signals; confirm. Open `references/providers/{provider}.md` and follow its **Setup** for how-to-run, prompt file, and credentials.
-2. **Bluejay agent.** Reuse (`list_agents`) or register (`add_agent`).
+2. **Bluejay agent.** Reuse (`list_agents`) or register (`add_agent` — note its required `knowledge_base` field accepts a free-form name string like "My Agent KB"; no pre-existing KB object is needed).
 3. **Simulation.** Reuse existing (`list_simulations`) or build one (`bulk_create_digital_humans` + `create_simulation`, `max_call_duration=5`/minutes). Ask first.
 4. **Targets.** Ask `target_pass_rate` (0.9), `max_iterations` (3), `min_improvement` (0.05).
 5. **Write `.bluejay/improve.yaml`.** Metrics are generated at loop start, not here.
@@ -39,15 +39,15 @@ Rule for every input: **detect → confirm → ask only if undetectable → defa
 ## The Loop
 
 ### 1. Generate metrics — once, frozen for the loop (auto, no asking)
-Ground "good" in what the agent is *supposed* to do — **never copied from the prompt you're fixing** (circular). Strongest signal: the agent's **tools** (a data-lookup tool ⇒ "answers from real data, not guesses"; an end-call tool ⇒ "ends when done"). Plus goals + channel best practice. Write each as a **fair, achievable** `pass_fail` metric (`create_custom_metric`); credit the outcome, not one mechanism. Reuse by name (`get_custom_metrics_by_agent`) so runs don't duplicate; attach to the sim (`update_simulation`); write ids to `success_metric_ids`. Frozen for the rest of the loop.
+Ground "good" in what the agent is *supposed* to do — **never copied from the prompt you're fixing** (circular). Strongest signal: the agent's **tools** (a data-lookup tool ⇒ "answers from real data, not guesses"; an end-call tool ⇒ "ends when done"). Plus goals + channel best practice. Write each as a **fair, achievable** `pass_fail` metric (`create_custom_metric`); credit the outcome, not one mechanism. Design every metric so a call where the agent never speaks **cannot pass it** — score observed agent behavior, not the absence of failure (an absent agent must fail or score N/A, never pass by default). Reuse by name (`get_custom_metrics_by_agent`) so runs don't duplicate; attach to the sim (`update_simulation`); write ids to `success_metric_ids`. Frozen for the rest of the loop.
 
 ### 2. Baseline
-Run the test via the provider reference's **Run** step → score = fraction of digital-human runs passing all metrics. Record `baseline_pass_rate`. If already ≥ `target_pass_rate`, report and exit.
+Run the test via the provider reference's **Run** step → score = fraction of digital-human runs passing all metrics. **Validity gate before scoring:** confirm the agent actually participated — the provider's Run step showed the job reach the agent, and the results show real agent turns (e.g. more than one turn, nonzero agent speech). A run that COMPLETED but where the agent never joined (callers alone, silence-timeout hangups) is an **environment failure** — see the provider's credentials preflight — not a 0% baseline; stop and fix the environment rather than diagnosing an agent that never spoke. Record `baseline_pass_rate`. If already ≥ `target_pass_rate`, report and exit.
 
 ### Each iteration (until a stop condition):
 3. **Diagnose** — pull failing transcripts (`get_trace`); cluster into named patterns with evidence + the metric each fails. Skip patterns history already tried and reverted.
-4. **Fix (0/1/many)** — one focused edit to `prompt_file` per pattern, **scoped narrowly** (an over-broad fix regresses another metric); **one commit per fix** on `{branch_prefix}/{date}`; open/append the PR.
-5. **Apply + Verify** — make the change live via the provider reference's **Apply** step, then re-run the test once. **Targeted:** did each fix's metric flip to passing? **Aggregate:** pass rate held/rose, nothing else regressed.
+4. **Fix (0/1/many)** — one focused edit to `prompt_file` per pattern, **scoped narrowly** (an over-broad fix regresses another metric); **one commit per fix** on `{branch_prefix}/{date}` (if that branch already exists from an earlier run, suffix `-r2`, `-r3`, …); open/append the PR.
+5. **Apply + Verify** — make the change live via the provider reference's **Apply** step, then re-run the test once (same validity gate as the baseline). **Targeted:** did each fix's metric flip to passing? **Aggregate:** pass rate held/rose, nothing else regressed.
 6. **Keep or revert — per fix** — keep only if its targeted metric flipped and nothing regressed; otherwise revert that commit, re-apply, and record it in history. Update `baseline_pass_rate`.
 7. **Loop or stop.**
 

@@ -9,7 +9,7 @@
 ## Setup (onboarding — detect → confirm → ask)
 1. **Run command + agent name.** Detect the entrypoint and `@server.rtc_session(agent_name="…")` (or `WorkerOptions(agent_name=…)`); read the run command from README/pyproject (default `uv run python src/agent.py dev`). Confirm. Ask only if not found.
 2. **Prompt file.** Detect a dedicated prompt file (e.g. `src/prompts/*.md`) or the inline `instructions=` string. Confirm which one the loop should edit.
-3. **Credentials.** Check `.env.local` has `LIVEKIT_URL` / `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`. If missing: `lk cloud auth` then `lk app env -w -d .env.local`. **Must be the same LiveKit project Bluejay dispatches into**, or the worker never receives the job and runs time out.
+3. **Credentials.** Check `.env.local` has `LIVEKIT_URL` / `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`. If missing: `lk cloud auth` then `lk app env -w -d .env.local`. **Must be the same LiveKit project Bluejay dispatches into.** If they differ, the failure is silent and misleading: runs still COMPLETE with evaluations, but the agent never joins — transcripts show only the caller talking, then a silence-timeout hangup. Treat that signature as a credentials mismatch, not agent behavior.
 4. **One-time deps.** `uv sync`; `uv run python <entrypoint> download-files` (Silero VAD + turn detector).
 
 ## Preflight (every run)
@@ -20,6 +20,7 @@
 
 ## Run (trigger the test)
 - Ensure the worker is running. `queue_simulation_run(simulation_id, livekit_agent_name)` → poll `get_simulation_runs` / `get_simulation` until done → `get_simulation_results(run_id)`.
+- **Dispatch check:** a job/session line must appear in the worker log within ~2 minutes of queueing. If the run completes with zero worker activity and caller-only transcripts, the dispatch went to a different LiveKit project (see Setup step 3) — stop and fix `.env.local`; do not score the run.
 
 ## Teardown
 - Always stop the worker on exit (and after an abort, before restoring the prompt).
