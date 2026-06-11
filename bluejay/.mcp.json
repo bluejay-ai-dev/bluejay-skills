@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "bluejay": {
+      "type": "http",
+      "url": "https://api.getbluejay.ai/mcp",
+      "headers": { "X-API-Key": "${BLUEJAY_API_KEY}" }
+    }
+  }
+}
