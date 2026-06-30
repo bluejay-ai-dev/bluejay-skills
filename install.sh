@@ -15,7 +15,6 @@ set -u
 MCP_URL="https://api.getbluejay.ai/mcp"
 API_BASE="https://api.getbluejay.ai/v1"
 SKILLS_REPO="https://github.com/bluejay-ai-dev/bluejay-skills.git"
-SKILLS_RAW="https://raw.githubusercontent.com/bluejay-ai-dev/bluejay-skills/main"
 BAC_SKILL_RAW="https://raw.githubusercontent.com/bluejay-ai-dev/docs/main/key-concepts/bluejay-as-code/skill.txt"
 SKILLS_DIR="$HOME/.bluejay/skills"
 SDK_PKG="bluejay-sdk"
