@@ -20,8 +20,7 @@ SKILLS_DIR="$HOME/.bluejay/skills"
 SDK_PKG="bluejay-sdk"
 
 # ---------- pretty output ----------
-if [ -t 1 ]; then B=$(printf '\033[1m'); D=$(printf '\033[2m'); G=$(printf '\033[32m'); Y=$(printf '\033[33m'); R=$(printf '\033[31m'); C=$(printf '\033[36m'); X=$(printf '\033[0m'); else B=; D=; G=; Y=; R=; C=; X=; fi
-info() { printf '%s\n' "${C}›${X} $*"; }
+if [ -t 1 ]; then B=$(printf '\033[1m'); D=$(printf '\033[2m'); G=$(printf '\033[32m'); Y=$(printf '\033[33m'); R=$(printf '\033[31m'); X=$(printf '\033[0m'); else B=; D=; G=; Y=; R=; X=; fi
 ok()   { printf '%s\n' "  ${G}✓${X} $*"; }
 warn() { printf '%s\n' "  ${Y}!${X} $*"; }
 err()  { printf '%s\n' "  ${R}✗${X} $*" >&2; }
@@ -95,10 +94,6 @@ install_sdk() {
     if uv pip install --system --upgrade "$SDK_PKG" >/dev/null 2>&1 || uv pip install --upgrade "$SDK_PKG" >/dev/null 2>&1; then
       ok "Installed $SDK_PKG (uv)"; return
     fi
-  fi
-  if have pipx; then
-    # pipx is for apps; bluejay-sdk is a library, so only use as a last resort venv
-    :
   fi
   if [ "$PY" != "" ]; then
     if "$PY" -m pip install --upgrade "$SDK_PKG" >/dev/null 2>&1 \
