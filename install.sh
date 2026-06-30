@@ -84,7 +84,9 @@ verify_key() {
 }
 
 persist_key() {
-  line="export BLUEJAY_API_KEY=\"$BLUEJAY_API_KEY\""
+  # single-quoted literal, with embedded single quotes escaped: ' -> '\''
+  esc=$(printf '%s' "$BLUEJAY_API_KEY" | sed "s/'/'\\\\''/g")
+  line="export BLUEJAY_API_KEY='$esc'"
   shell_name=$(basename "${SHELL:-sh}")
   case "$shell_name" in
     zsh)  rc="$HOME/.zshrc" ;;
@@ -136,6 +138,7 @@ download_skills() {
     warn "git not found — skipping skill download (Claude plugin still works)"
   fi
   # Bluejay-as-Code skill is a portable plain-text system prompt
+  mkdir -p "$SKILLS_DIR"   # clone may have rm-rf'd it on failure
   if have curl; then
     curl -fsSL "$BAC_SKILL_RAW" -o "$SKILLS_DIR/bluejay-as-code.skill.txt" 2>/dev/null \
       && ok "Saved bluejay-as-code.skill.txt" || true
@@ -191,16 +194,14 @@ KEY_JSON_HEADERS=""   # set in main() once the key is resolved
 configure_claude_code() {
   have claude || return
   sec "Claude Code"
-  claude mcp remove bluejay -s user >/dev/null 2>&1 || true
-  if claude mcp add --transport http --scope user bluejay "$MCP_URL" --header "X-API-Key: $BLUEJAY_API_KEY" >/dev/null 2>&1; then
-    ok "MCP server wired (user scope)"
-  else
-    warn "claude mcp add failed — check 'claude mcp list'"
-  fi
+  # The plugin is the single source of truth — it auto-wires the bluejay MCP
+  # server via ${BLUEJAY_API_KEY} (persisted above), so no separate `claude mcp add`.
   if claude plugin marketplace add bluejay-ai-dev/bluejay-skills >/dev/null 2>&1; then
-    claude plugin install bluejay@bluejay-skills >/dev/null 2>&1 \
-      && ok "Skills plugin installed (/bluejay:self-improve)" \
-      || warn "Plugin install failed — run: claude plugin install bluejay@bluejay-skills"
+    if claude plugin install bluejay@bluejay-skills >/dev/null 2>&1; then
+      ok "Skills plugin installed + MCP auto-wired (/bluejay:self-improve)"
+    else
+      warn "Plugin install failed — run: claude plugin install bluejay@bluejay-skills"
+    fi
   else
     warn "Could not add plugin marketplace — run: claude plugin marketplace add bluejay-ai-dev/bluejay-skills"
   fi
