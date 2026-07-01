@@ -1,39 +1,43 @@
 # Bluejay Skills
 
-Self-improving voice agents, in Claude Code. Point Bluejay at your agent and a test simulation — it runs the sim, diagnoses why calls fail, fixes your agent's prompt, verifies each fix, and opens a PR, looping until your target pass rate.
+Skills for testing and self-improving voice/chat agents with Bluejay, across your AI coding tools.
 
-## Install (Claude Code)
+## Install
+
+One command wires the Bluejay MCP + these skills into every AI coding tool you have (Claude Code,
+Codex, Gemini, Cursor, Windsurf, Antigravity, Claude Desktop), then runs guided onboarding:
+
+```
+npx bluejay
+```
+
+**Claude Code only**, if you'd rather install the plugin by hand:
 
 ```
 /plugin marketplace add bluejay-ai-dev/bluejay-skills
 /plugin install bluejay@bluejay-skills
-```
-
-Then set your API key (app.getbluejay.ai → Settings → API Keys):
-
-```
 export BLUEJAY_API_KEY=...
 ```
 
-That's it — the Bluejay MCP is wired automatically by the plugin.
+The Bluejay MCP is wired automatically by the plugin.
 
 ## Use
 
 ```
-/bluejay:self-improve
+/bluejay:onboard        # first run: connect your agent, build a sim, watch it go live
+/bluejay:self-improve   # close the loop: test → diagnose → fix → verify → PR
 ```
-
-On the first run it walks you through connecting your agent and a simulation, then starts the improvement loop.
 
 ## Prerequisites
 
 - A **Bluejay account + API key** — https://getbluejay.ai
-- For self-hosted **LiveKit** agents: a LiveKit Cloud project (the worker runs locally during the loop)
+- For self-hosted **LiveKit** agents: a LiveKit Cloud project (the worker runs locally during a run)
 
 ## What's included
 
 | Skill | What it does |
 |---|---|
+| `/bluejay:onboard` | First-run onboarding: connect your agent, build a simulation with digital humans matching your use case, run it, and hand you the live run |
 | `/bluejay:self-improve` | Multi-round test → diagnose → fix → verify loop against a Bluejay simulation; opens a PR with the kept fixes |
 
 ## Links
