@@ -12,6 +12,20 @@
 # the only fatal paths (missing/invalid key) call `exit 1` explicitly.
 set -u
 
+# ---------- hand off to bluejay-cli (one installer, one animation) ----------
+# When Node 18+ is available and we can reach a real terminal, the interactive
+# bluejay-cli owns the whole experience (same splash + install board shown in
+# onboarding). Under `curl | sh`, stdin is the pipe, so re-attach /dev/tty for
+# the CLI's raw-mode prompts. The shell flow below stays as the fallback for
+# machines without Node and for non-interactive runs. BLUEJAY_NO_CLI=1 skips.
+if [ "${BLUEJAY_NO_CLI:-}" = "" ] && (: < /dev/tty) 2>/dev/null && command -v npx >/dev/null 2>&1; then
+  NODE_MAJOR=$(node -v 2>/dev/null | sed 's/^v//' | cut -d. -f1)
+  case "$NODE_MAJOR" in
+    ''|*[!0-9]*) : ;;
+    *) [ "$NODE_MAJOR" -ge 18 ] && exec npx -y github:bluejay-ai-dev/bluejay-cli "$@" < /dev/tty ;;
+  esac
+fi
+
 MCP_URL="https://api.getbluejay.ai/mcp"
 API_BASE="https://api.getbluejay.ai/v1"
 SKILLS_REPO="https://github.com/bluejay-ai-dev/bluejay-skills.git"
