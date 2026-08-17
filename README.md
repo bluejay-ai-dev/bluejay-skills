@@ -59,6 +59,7 @@ Same skills as the Bluejay AI assistant in the app, now runnable from Claude Cod
 | Skill | What it does |
 |---|---|
 | `/bluejay:self-improve` | Multi-round test → diagnose → fix → verify loop; opens a PR with the kept fixes |
+| `/bluejay:self-improve-digital-humans` | Is each *test* worth keeping? Judges usefulness from run history + real traffic, then hardens the ones worth fixing |
 | `/bluejay:custom-metric-builder` | Turn a quality bar into well-formed pass/fail custom metrics |
 | `/bluejay:agent-regression` | Re-test and verify a change didn't make the agent worse |
 | `/bluejay:coverage-audit` | Find conversation branches no test currently exercises |
