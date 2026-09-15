@@ -1,0 +1,20 @@
+bluejay/skills/background-noise/SKILL.md
+  s_d8c326bd85abc1::t_3ded9b3d4845a4 1-2,4-9,11-15,17-19,22-25,27-28,30,32,34-38,40-43,45-46
+  s_d8c326bd85abc1::t_ec231b7421e583 3,10,16,20-21,26,29,31,33,39,44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d7414966c91fe8e2b1437497b71ef96056ff8735",
+  "prompts": {},
+  "sessions": {
+    "s_d8c326bd85abc1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f9fe1cfe-0cc9-4862-b08e-ba34062ba999",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Lorenzo Taylor <lmtaylor9@dons.usfca.edu>"
+    }
+  }
+}
