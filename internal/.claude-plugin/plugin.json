@@ -1,0 +1,8 @@
+{
+  "name": "bluejay-internal",
+  "version": "0.1.0",
+  "description": "Internal engineering skills for the Bluejay team. Not published to the customer marketplace.",
+  "author": { "name": "Bluejay" },
+  "homepage": "https://getbluejay.ai",
+  "license": "UNLICENSED"
+}
