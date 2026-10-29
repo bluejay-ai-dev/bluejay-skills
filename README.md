@@ -9,13 +9,13 @@ Bluejay voice/chat agent testing, evaluation, observability, and self-improvemen
 /plugin install bluejay@bluejay-skills
 ```
 
-Then set your API key (app.getbluejay.ai → Settings → API Keys):
+Then run `/mcp`, pick `bluejay`, and sign in with your Bluejay account in the browser. Pick the organization and workspace Claude should work in, and you're connected.
+
+For CI or other non-interactive use, set an API key instead (app.getbluejay.ai → Settings → API Keys) and the sign-in is skipped:
 
 ```
 export BLUEJAY_API_KEY=...
 ```
-
-That's it — the Bluejay MCP is wired automatically by the plugin.
 
 ## Use
 
@@ -28,7 +28,7 @@ Or type `/bluejay:` in Claude Code to see the full list. Every skill runs over t
 
 ## Prerequisites
 
-- A **Bluejay account + API key** — https://getbluejay.ai
+- A **Bluejay account** — https://getbluejay.ai
 - For self-hosted **LiveKit** agents: a LiveKit Cloud project (the worker runs locally during the loop)
 
 ## What's included

@@ -12,7 +12,7 @@ No diagnosis, no fixing (that's `/bluejay:self-improve` later).
 **Rule for every input: detect → confirm → ask only if undetectable → default. Never ask what you can read; always confirm before creating anything in Bluejay.**
 
 ## Preflight
-1. **MCP connected?** `mcp__bluejay__*` tools available — if not, stop: the user needs to finish `npx bluejay` / set `BLUEJAY_API_KEY`, then reopen.
+1. **MCP connected?** `mcp__bluejay__*` tools available — if not, stop: the user needs to run `/mcp`, pick `bluejay` and sign in (or set `BLUEJAY_API_KEY`), then reopen.
 2. **Greet briefly.** One line on what's about to happen (4 steps, ~2 min, ends at a live run). Then go.
 
 ## 1 · Connect the agent
