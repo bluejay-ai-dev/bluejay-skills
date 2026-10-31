@@ -3,7 +3,7 @@
     "bluejay": {
       "type": "http",
       "url": "https://api.getbluejay.ai/mcp",
-      "headers": { "X-API-Key": "${BLUEJAY_API_KEY}" }
+      "headers": { "X-API-Key": "${BLUEJAY_API_KEY:-}" }
     }
   }
 }
