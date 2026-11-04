@@ -9,9 +9,9 @@ Get a new user from nothing to a **running simulation** in one guided pass, all 
 The finish line is the **live run** — connect the agent → build a matching simulation → run it → link them to it.
 No diagnosis, no fixing (that's `/bluejay:self-improve` later).
 
-**Rule for every input: detect → ask only if undetectable → default. Never ask what you can read. Creating agents, digital humans and simulations is free, so do it without asking. The only confirmation is the one before `queue_simulation_run`, which spends credits.**
+**Rule for every input: detect → ask only if undetectable → default. Never ask what you can read. Create agents, digital humans and simulations directly; creating is free. The only confirmation is the one before `queue_simulation_run`, which spends credits.**
 
-New users don't know what a digital human or a simulation is. Don't ask them whether to attach one to the other; a digital human only runs inside a simulation, so always attach it.
+A digital human only runs inside a simulation, so always attach it at creation.
 
 ## Preflight
 1. **MCP connected?** `mcp__bluejay__*` tools available — if not, stop: the user needs to run `/mcp`, pick `bluejay` and sign in (or set `BLUEJAY_API_KEY`), then reopen.
@@ -24,7 +24,7 @@ The thing being tested is the user's voice/chat agent.
 
 ## 2 · Build the simulation (digital humans that match their use case)
 1. **Infer the use case.** Read the agent's prompt, tools, and goals to describe who calls it and why (e.g. "borrowers asking about payoff amounts", "patients rescheduling appointments"). State it back in one sentence and keep going.
-2. **Create the simulation.** `create_simulation(agent_id, name, max_call_duration=5)` (minutes). Always a fresh one, so the run holds only what you create here. It takes no digital humans; they attach in the next step.
+2. **Create the simulation.** `create_simulation(agent_id, name, max_call_duration=5)` (minutes). Always a fresh one, so the run holds only what you create here.
 3. **Create the digital humans in that simulation.** `create_digital_humans(digital_humans=[...], simulation_ids=[<sim id>])` hand-authors 1–3, or `generate_digital_humans(agent_id, count, simulation_id=<sim id>)` generates them. Aim for a small, realistic spread: a couple of common callers plus one edge case. Always pass the simulation id so they land attached. Check the result's errors; fix or drop any digital human that failed before moving on.
 
 ## 3 · Run it
@@ -37,7 +37,7 @@ As soon as the run is queued/running, **give the user the link and stop** — do
 - Point to next steps: watch the run finish in the dashboard; when you want to close the loop on failures, run `/bluejay:self-improve`.
 
 ## Safety invariants
-- Never ask before a create (`add_agent`, `create_simulation`, `create_digital_humans`, `generate_digital_humans`). Ask once, with the cost, before `queue_simulation_run`.
+- The one question is before `queue_simulation_run`, with the cost.
 - Any simulation created here is capped at 5-minute calls.
 - Never mutate the user's production agent; onboarding only reads it to infer the use case.
 - If a precondition fails (no MCP, agent unreachable, livekit creds missing), stop and report the fix — don't guess or fabricate ids.
