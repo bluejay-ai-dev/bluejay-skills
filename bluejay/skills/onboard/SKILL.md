@@ -1,6 +1,6 @@
 ---
 name: onboard
-description: First-run onboarding for Bluejay. Walks the user through creating and running their very first simulation entirely over the Bluejay MCP — connect (or register) their voice/chat agent, build a simulation whose digital humans match their real use case, queue the run, and hand them the live run link. Ends as soon as the run is going; does not diagnose or fix. Use when a user is new to Bluejay, asks to "get started", "set up my first simulation", or is dropped here by `npx bluejay`. Safe and read-mostly until the user confirms each create.
+description: First-run onboarding for Bluejay. Walks the user through creating and running their very first simulation entirely over the Bluejay MCP — connect (or register) their voice/chat agent, build a simulation whose digital humans match their real use case, queue the run, and hand them the live run link. Ends as soon as the run is going; does not diagnose or fix. Use when a user is new to Bluejay, asks to "get started", "set up my first simulation", or is dropped here by `npx bluejay`. Creates what it needs without asking, then asks once before the run spends credits.
 ---
 
 # Bluejay Onboard
@@ -9,7 +9,9 @@ Get a new user from nothing to a **running simulation** in one guided pass, all 
 The finish line is the **live run** — connect the agent → build a matching simulation → run it → link them to it.
 No diagnosis, no fixing (that's `/bluejay:self-improve` later).
 
-**Rule for every input: detect → confirm → ask only if undetectable → default. Never ask what you can read; always confirm before creating anything in Bluejay.**
+**Rule for every input: detect → ask only if undetectable → default. Never ask what you can read. Creating agents, digital humans and simulations is free, so do it without asking. The only confirmation is the one before `queue_simulation_run`, which spends credits.**
+
+New users don't know what a digital human or a simulation is. Don't ask them whether to attach one to the other; a digital human only runs inside a simulation, so always attach it.
 
 ## Preflight
 1. **MCP connected?** `mcp__bluejay__*` tools available — if not, stop: the user needs to run `/mcp`, pick `bluejay` and sign in (or set `BLUEJAY_API_KEY`), then reopen.
@@ -17,16 +19,16 @@ No diagnosis, no fixing (that's `/bluejay:self-improve` later).
 
 ## 1 · Connect the agent
 The thing being tested is the user's voice/chat agent.
-1. **Reuse or register.** `list_agents`. If one obviously matches their repo/use case, confirm and use it. Otherwise `add_agent` (its `knowledge_base` field takes a free-form name string like "My Agent KB" — no pre-existing KB object needed).
-2. **Provider / how it's reached.** Detect from the agent's `connection_type` + repo signals; confirm. For a phone/hosted agent, Bluejay dials it directly — nothing to run locally. For a **self-hosted LiveKit** agent, the local worker must be running during the sim — open `../self-improve/references/providers/livekit-local.md` and follow its **Setup** (credentials, run command) before step 3.
+1. **Reuse or register.** `list_agents`. If one obviously matches their repo/use case, use it. Otherwise `add_agent` (its `knowledge_base` field takes a free-form name string like "My Agent KB" — no pre-existing KB object needed).
+2. **Provider / how it's reached.** Detect from the agent's `connection_type` + repo signals. For a phone/hosted agent, Bluejay dials it directly — nothing to run locally. For a **self-hosted LiveKit** agent, the local worker must be running during the sim — open `../self-improve/references/providers/livekit-local.md` and follow its **Setup** (credentials, run command) before step 3.
 
 ## 2 · Build the simulation (digital humans that match their use case)
-1. **Infer the use case.** Read the agent's prompt, tools, and goals to describe who calls it and why (e.g. "borrowers asking about payoff amounts", "patients rescheduling appointments"). State it back in one sentence and confirm.
-2. **Generate matching digital humans.** `generate_digital_humans` from that use case (or hand-author 2–3 with `bulk_create_digital_humans`). Aim for a small, realistic spread — a couple of common callers plus one edge case. Show the list; let the user tweak before committing.
-3. **Create the simulation.** `create_simulation` with those digital humans. **Cap calls: `max_call_duration=5` (minutes).** Confirm the name.
+1. **Infer the use case.** Read the agent's prompt, tools, and goals to describe who calls it and why (e.g. "borrowers asking about payoff amounts", "patients rescheduling appointments"). State it back in one sentence and keep going.
+2. **Find or create the simulation.** `list_simulations` for this agent; reuse one that fits. Otherwise `create_simulation(agent_id, name, max_call_duration=5)` (minutes). It takes no digital humans; they attach in the next step.
+3. **Create the digital humans in that simulation.** `create_digital_humans(digital_humans=[...], simulation_ids=[<sim id>])` hand-authors 1–3, or `generate_digital_humans(agent_id, count, simulation_id=<sim id>)` generates them. Aim for a small, realistic spread: a couple of common callers plus one edge case. Always pass the simulation id so they land attached.
 
 ## 3 · Run it
-`queue_simulation_run(simulation_id, …)` (pass the `livekit_agent_name` too for the livekit-local provider). Confirm it's queued/accepted.
+Ask exactly one question: **ready to run?** Name the simulation, the digital human count, and the cost: up to N digital humans × runs each × 5 minutes of calls, billed against the org's credits. On yes, `queue_simulation_run(simulation_id, …)` (pass the `livekit_agent_name` too for the livekit-local provider). Confirm it's queued/accepted.
 
 ## 4 · Hand off to the live run
 As soon as the run is queued/running, **give the user the link and stop** — don't poll to completion.
@@ -35,7 +37,7 @@ As soon as the run is queued/running, **give the user the link and stop** — do
 - Point to next steps: watch the run finish in the dashboard; when you want to close the loop on failures, run `/bluejay:self-improve`.
 
 ## Safety invariants
-- Confirm before every create (`add_agent`, `bulk_create_digital_humans`, `create_simulation`) and before `queue_simulation_run`.
+- Never ask before a create (`add_agent`, `create_simulation`, `create_digital_humans`, `generate_digital_humans`). Ask once, with the cost, before `queue_simulation_run`.
 - Any simulation created here is capped at 5-minute calls.
 - Never mutate the user's production agent; onboarding only reads it to infer the use case.
 - If a precondition fails (no MCP, agent unreachable, livekit creds missing), stop and report the fix — don't guess or fabricate ids.
