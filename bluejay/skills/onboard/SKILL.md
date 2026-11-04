@@ -24,11 +24,11 @@ The thing being tested is the user's voice/chat agent.
 
 ## 2 · Build the simulation (digital humans that match their use case)
 1. **Infer the use case.** Read the agent's prompt, tools, and goals to describe who calls it and why (e.g. "borrowers asking about payoff amounts", "patients rescheduling appointments"). State it back in one sentence and keep going.
-2. **Find or create the simulation.** `list_simulations` for this agent; reuse one that fits. Otherwise `create_simulation(agent_id, name, max_call_duration=5)` (minutes). It takes no digital humans; they attach in the next step.
-3. **Create the digital humans in that simulation.** `create_digital_humans(digital_humans=[...], simulation_ids=[<sim id>])` hand-authors 1–3, or `generate_digital_humans(agent_id, count, simulation_id=<sim id>)` generates them. Aim for a small, realistic spread: a couple of common callers plus one edge case. Always pass the simulation id so they land attached.
+2. **Create the simulation.** `create_simulation(agent_id, name, max_call_duration=5)` (minutes). Always a fresh one, so the run holds only what you create here. It takes no digital humans; they attach in the next step.
+3. **Create the digital humans in that simulation.** `create_digital_humans(digital_humans=[...], simulation_ids=[<sim id>])` hand-authors 1–3, or `generate_digital_humans(agent_id, count, simulation_id=<sim id>)` generates them. Aim for a small, realistic spread: a couple of common callers plus one edge case. Always pass the simulation id so they land attached. Check the result's errors; fix or drop any digital human that failed before moving on.
 
 ## 3 · Run it
-Ask exactly one question: **ready to run?** Name the simulation, the digital human count, and the cost: up to N digital humans × runs each × 5 minutes of calls, billed against the org's credits. On yes, `queue_simulation_run(simulation_id, …)` (pass the `livekit_agent_name` too for the livekit-local provider). Confirm it's queued/accepted.
+Ask exactly one question: **ready to run?** Name the simulation, the number of digital humans attached, and the cost: that count × 5 minutes of calls at most, billed against the org's credits. On yes, `queue_simulation_run(simulation_id, …)` (pass the `livekit_agent_name` too for the livekit-local provider). Confirm it's queued/accepted.
 
 ## 4 · Hand off to the live run
 As soon as the run is queued/running, **give the user the link and stop** — don't poll to completion.
