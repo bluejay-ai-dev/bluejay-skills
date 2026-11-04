@@ -28,7 +28,7 @@ The thing being tested is the user's voice/chat agent.
 3. **Create the digital humans in that simulation.** `create_digital_humans(digital_humans=[...], simulation_ids=[<sim id>])` hand-authors 1–3, or `generate_digital_humans(agent_id, count, simulation_id=<sim id>)` generates them. Aim for a small, realistic spread: a couple of common callers plus one edge case. Always pass the simulation id so they land attached. Check the result's errors; fix or drop any digital human that failed before moving on.
 
 ## 3 · Run it
-Ask exactly one question: **ready to run?** Name the simulation, the number of digital humans attached, and the cost: that count × 5 minutes of calls at most, billed against the org's credits. On yes, `queue_simulation_run(simulation_id, …)` (pass the `livekit_agent_name` too for the livekit-local provider). Confirm it's queued/accepted.
+Ask exactly one question: **"Ready to run your tests?"** Name the simulation, the number of digital humans attached, and the cost: that count × 5 minutes of calls at most, billed against the org's credits. On yes, `queue_simulation_run(simulation_id, …)` (pass the `livekit_agent_name` too for the livekit-local provider). Confirm it's queued/accepted.
 
 ## 4 · Hand off to the live run
 As soon as the run is queued/running, **give the user the link and stop** — don't poll to completion.
